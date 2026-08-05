@@ -6,16 +6,7 @@ module.exports = {
     "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
-    extend: {
-      colors: {
-        scp: {
-          red: '#dc2626',
-          dark: '#0a0a0a',
-          card: '#121212',
-          accent: '#22c55e',
-        }
-      }
-    },
+    extend: {},
   },
   plugins: [],
-}
+};
