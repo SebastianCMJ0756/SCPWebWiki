@@ -2,9 +2,9 @@ import Link from 'next/link';
 
 export default function Home() {
   return (
-    <main className="min-h-screen bg-black text-green-500 font-mono p-6 sm:p-12 flex flex-col justify-center items-center">
+    <main className="min-h-screen bg-transparent text-green-500 font-mono p-6 sm:p-12 flex flex-col justify-center items-center">
       {/* Contenedor principal tipo terminal */}
-      <div className="w-full max-w-5xl border-2 border-green-500 bg-black/90 p-6 sm:p-10 shadow-[0_0_20px_rgba(34,197,94,0.2)] rounded-sm">
+      <div className="w-full max-w-5xl border-2 border-green-500 bg-black/70 p-6 sm:p-10 shadow-[0_0_20px_rgba(34,197,94,0.2)] rounded-sm">
         
         {/* Encabezado superior tipo sistema */}
         <div className="border-b border-green-500/40 pb-4 mb-8 flex justify-between items-center text-xs text-green-700 tracking-widest uppercase">
