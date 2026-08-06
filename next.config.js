@@ -1,10 +1,13 @@
 /** @type {import('next').NextConfig} */
-const repoName = 'SCPWebWiki'; // <-- Escribe el nombre EXACTO de tu repositorio en GitHub
+const repoName = 'SCPWebWiki';
+const isProd = process.env.NODE_ENV === 'production';
 
 const nextConfig = {
   output: 'export',
-  basePath: process.env.NODE_ENV === 'production' ? `/${repoName}` : '',
-  assetPrefix: process.env.NODE_ENV === 'production' ? `/${repoName}/` : '',
+  trailingSlash: true,
+  skipTrailingSlashRedirect: true,
+  basePath: isProd ? `/${repoName}` : '',
+  assetPrefix: isProd ? `/${repoName}/` : '',
   images: {
     unoptimized: true,
   },
