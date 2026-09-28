@@ -42,9 +42,12 @@ export default function Home() {
             </span>
 
             {/* Botón Iniciar Sesión */}
-            <button className="w-full bg-green-900/30 hover:bg-green-500 hover:text-black text-green-400 font-bold py-3 px-4 border border-green-500 transition-all duration-200 tracking-wider text-sm uppercase text-center shadow-[0_0_10px_rgba(34,197,94,0.1)]">
+            <Link 
+              href="/login"
+              className="w-full bg-green-900/30 hover:bg-green-500 hover:text-black text-green-400 font-bold py-3 px-4 border border-green-500 transition-all duration-200 tracking-wider text-sm uppercase text-center shadow-[0_0_10px_rgba(34,197,94,0.1)] block"
+            >
               [ Iniciar Sesión ]
-            </button>
+            </Link>
 
             {/* Botón Registrarse */}
             <button className="w-full bg-transparent hover:bg-green-900/40 text-green-500 hover:text-green-300 font-bold py-3 px-4 border border-green-500/60 hover:border-green-400 transition-all duration-200 tracking-wider text-sm uppercase text-center">
