@@ -13,7 +13,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="es">
-      <body className="bg-transparent text-green-500 font-mono relative min-h-screen overflow-x-hidden">
+      <body className="bg-transparent text-white font-mono relative min-h-screen overflow-x-hidden">
         {/* Fondo animado DarkVeil detrás de toda la app */}
         <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
           <DarkVeil
