@@ -14,17 +14,19 @@ export default function LoginPage() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+
+    // Validar que los campos no estén vacíos
+    if (!username.trim() || !password.trim()) {
+      setError('ERROR: DEBE INGRESAR LOS DATOS NECESARIOS. SI NO ESTÁ REGISTRADO, DEBE REGISTRARSE PARA PODER INGRESAR.');
+      return;
+    }
+
     setLoading(true);
 
     // Simulación de autenticación
     setTimeout(() => {
-      if (username.trim() && password.trim()) {
-        // Aquí iría la lógica real de autenticación
-        router.push('/scp');
-      } else {
-        setError('ERROR: CREDENCIALES INVÁLIDAS. VERIFIQUE SUS DATOS.');
-        setLoading(false);
-      }
+      // Aquí iría la lógica real de autenticación
+      router.push('/scp');
     }, 800);
   };
 
@@ -100,17 +102,26 @@ export default function LoginPage() {
           </button>
         </form>
 
-        {/* Enlace de registro */}
-        <div className="mt-6 pt-6 border-t border-white/20 text-center">
-          <p className="text-xs text-gray-400 mb-3 tracking-widest uppercase">
+        {/* Enlaces de navegación */}
+        <div className="mt-6 pt-6 border-t border-white/20 text-center space-y-3">
+          <p className="text-xs text-gray-400 tracking-widest uppercase">
             ¿No tiene una cuenta?
           </p>
-          <Link 
-            href="/"
-            className="text-xs text-gray-500 hover:text-white underline tracking-widest transition-colors"
-          >
-            &gt; Volver al inicio
-          </Link>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-6">
+            <Link 
+              href="/register"
+              className="text-xs text-gray-500 hover:text-white underline tracking-widest transition-colors"
+            >
+              &gt; Registrarse
+            </Link>
+            <span className="text-gray-700 hidden sm:inline">|</span>
+            <Link 
+              href="/"
+              className="text-xs text-gray-500 hover:text-white underline tracking-widest transition-colors"
+            >
+              &gt; Volver al inicio
+            </Link>
+          </div>
         </div>
 
         {/* Pie de terminal con efecto de cursor parpadeante */}
