@@ -26,6 +26,8 @@ function SCPLogo() {
   );
 }
 
+const API_URL = 'https://script.google.com/macros/s/AKfycbxcR-oDtgo5GVYJ3ClkSQadNegchqyoDJbMB-hgSJO2ZIk7Bu-eYsIAGBMqtrQNlpkw/exec';
+
 export default function RegisterPage() {
   const [formData, setFormData] = useState({
     nombre: '',
@@ -40,6 +42,11 @@ export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
+  const [step, setStep] = useState<'register' | 'verify'>('register');
+  const [verifyCode, setVerifyCode] = useState('');
+  const [apiError, setApiError] = useState('');
+  const [verifyLoading, setVerifyLoading] = useState(false);
+  const [registeredEmail, setRegisteredEmail] = useState('');
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -90,16 +97,81 @@ export default function RegisterPage() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validateForm()) return;
 
     setLoading(true);
-    // Simulación de registro
-    setTimeout(() => {
+    setApiError('');
+
+    try {
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'text/plain',
+        },
+        body: JSON.stringify({
+          action: 'register',
+          nombre: formData.nombre,
+          apellido: formData.apellido,
+          edad: parseInt(formData.edad, 10),
+          email: formData.email,
+          username: formData.username,
+          password: formData.password,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setRegisteredEmail(formData.email);
+        setStep('verify');
+      } else {
+        setApiError(data.error || 'Error desconocido durante el registro.');
+      }
+    } catch (error) {
+      setApiError('Error de conexión con el servidor. Intente nuevamente.');
+    } finally {
       setLoading(false);
-      alert('Registro completado exitosamente');
-    }, 1500);
+    }
+  };
+
+  const handleVerify = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!verifyCode.trim()) {
+      setApiError('Debe ingresar el código de verificación.');
+      return;
+    }
+
+    setVerifyLoading(true);
+    setApiError('');
+
+    try {
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'text/plain',
+        },
+        body: JSON.stringify({
+          action: 'verify',
+          email: registeredEmail,
+          code: verifyCode,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setStep('register');
+        alert('NIVEL 1 AUTORIZADO. Registro completado exitosamente.');
+      } else {
+        setApiError(data.error || 'Código incorrecto o expirado.');
+      }
+    } catch (error) {
+      setApiError('Error de conexión con el servidor. Intente nuevamente.');
+    } finally {
+      setVerifyLoading(false);
+    }
   };
 
   const accessLevels = [
@@ -365,10 +437,79 @@ export default function RegisterPage() {
               disabled={loading}
               className="w-full sm:w-auto sm:px-12 bg-white/10 hover:bg-white hover:text-black text-white font-bold py-4 px-8 border border-white/40 transition-all duration-200 tracking-wider text-sm uppercase text-center shadow-[0_0_15px_rgba(255,255,255,0.1)] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white/10 disabled:hover:text-white"
             >
-              {loading ? '[ PROCESANDO... ]' : '[ Iniciar Protocolo de Registro ]'}
+              {loading ? '[ Estableciendo conexión segura con el servidor central... ]' : '[ Iniciar Protocolo de Registro ]'}
             </button>
           </div>
         </form>
+
+        {/* Pantalla de Verificación de Identidad */}
+        {step === 'verify' && (
+          <div className="mt-10 pt-6 border-t border-white/20">
+            <div className="max-w-md mx-auto text-center space-y-6">
+              <div className="border border-white/30 bg-black/50 p-6">
+                <h2 className="text-lg font-bold text-white uppercase tracking-wider mb-4">
+                  Verificación de Identidad
+                </h2>
+                <p className="text-sm text-gray-400 mb-2">
+                  Se ha enviado un código de autorización de 6 dígitos a:
+                </p>
+                <p className="text-sm text-white font-bold mb-4">{registeredEmail}</p>
+                <p className="text-xs text-gray-500 mb-6">
+                  El código expira en 5 minutos. Revise su bandeja de entrada.
+                </p>
+
+                <form onSubmit={handleVerify} className="space-y-4">
+                  <div className="space-y-2">
+                    <label htmlFor="verifyCode" className="block text-xs text-gray-400 uppercase tracking-widest">
+                      &gt; Código de Autorización
+                    </label>
+                    <input
+                      id="verifyCode"
+                      type="text"
+                      inputMode="numeric"
+                      maxLength={6}
+                      value={verifyCode}
+                      onChange={(e) => {
+                        const value = e.target.value.replace(/\D/g, '');
+                        setVerifyCode(value);
+                        setApiError('');
+                      }}
+                      placeholder="000000"
+                      className="w-full bg-black/50 border border-white/30 focus:border-white/60 focus:shadow-[0_0_10px_rgba(255,255,255,0.2)] text-gray-200 placeholder-gray-600 px-4 py-3 text-sm tracking-widest text-center text-lg outline-none transition-all duration-200"
+                    />
+                  </div>
+
+                  {apiError && (
+                    <div className="border border-red-500/50 bg-red-900/20 px-4 py-3 text-xs text-red-400 tracking-wider">
+                      {apiError}
+                    </div>
+                  )}
+
+                  <button
+                    type="submit"
+                    disabled={verifyLoading}
+                    className="w-full bg-white/10 hover:bg-white hover:text-black text-white font-bold py-3 px-4 border border-white/40 transition-all duration-200 tracking-wider text-sm uppercase text-center shadow-[0_0_10px_rgba(255,255,255,0.1)] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white/10 disabled:hover:text-white"
+                  >
+                    {verifyLoading ? '[ Verificando código... ]' : '[ Verificar Código ]'}
+                  </button>
+                </form>
+
+                <div className="mt-4 pt-4 border-t border-white/10">
+                  <button
+                    onClick={() => {
+                      setStep('register');
+                      setVerifyCode('');
+                      setApiError('');
+                    }}
+                    className="text-xs text-gray-500 hover:text-white underline tracking-widest transition-colors"
+                  >
+                    &gt; Volver al registro
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Enlace de login */}
         <div className="mt-6 text-center">
