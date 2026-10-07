@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
 // Logo SCP como componente SVG
@@ -29,6 +30,7 @@ function SCPLogo() {
 const API_URL = 'https://script.google.com/macros/s/AKfycbxcR-oDtgo5GVYJ3ClkSQadNegchqyoDJbMB-hgSJO2ZIk7Bu-eYsIAGBMqtrQNlpkw/exec';
 
 export default function RegisterPage() {
+  const router = useRouter();
   const [formData, setFormData] = useState({
     nombre: '',
     apellido: '',
@@ -102,6 +104,7 @@ export default function RegisterPage() {
     if (!validateForm()) return;
 
     setLoading(true);
+
     setApiError('');
 
     try {
@@ -162,8 +165,7 @@ export default function RegisterPage() {
       const data = await response.json();
 
       if (data.success) {
-        setStep('register');
-        alert('NIVEL 1 AUTORIZADO. Registro completado exitosamente.');
+        router.push('/login');
       } else {
         setApiError(data.error || 'Código incorrecto o expirado.');
       }
@@ -198,7 +200,7 @@ export default function RegisterPage() {
             Registro de Personal
           </h1>
           <p className="text-xs sm:text-sm text-gray-400 mt-2 tracking-widest uppercase">
-            Campos requeridos para el registro valido en el sistema
+          Campos requeridos para el registro valido en el sistema
           </p>
         </div>
 
@@ -505,6 +507,12 @@ export default function RegisterPage() {
                   >
                     &gt; Volver al registro
                   </button>
+                  <Link
+                    href="/"
+                    className="block mt-3 text-xs text-gray-500 hover:text-white underline tracking-widest transition-colors"
+                  >
+                    &gt; Volver al inicio
+                  </Link>
                 </div>
               </div>
             </div>
