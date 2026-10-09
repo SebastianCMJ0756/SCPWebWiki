@@ -11,7 +11,7 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
 
@@ -23,11 +23,41 @@ export default function LoginPage() {
 
     setLoading(true);
 
-    // Simulación de autenticación
-    setTimeout(() => {
-      // Aquí iría la lógica real de autenticación
-      router.push('/scp');
-    }, 800);
+    try {
+      const API_URL = 'https://script.google.com/macros/s/AKfycbxcR-oDtgo5GVYJ3ClkSQadNegchqyoDJbMB-hgSJO2ZIk7Bu-eYsIAGBMqtrQNlpkw/exec';
+
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'text/plain',
+        },
+        body: JSON.stringify({
+          action: 'login',
+          username: username,
+          password: password,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success === true) {
+        // Guardar sesión en localStorage
+        localStorage.setItem('scp_session', JSON.stringify({
+          username: data.user?.username || username,
+          email: data.user?.email || '',
+          nombre: data.user?.nombre || '',
+          accessLevel: data.user?.accessLevel || '1',
+          loginTime: new Date().toISOString()
+        }));
+        router.push('/scp');
+      } else {
+        setError(data.error || 'Error de autenticación.');
+      }
+    } catch {
+      setError('Error de conexión con el servidor. Intente nuevamente.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -98,7 +128,7 @@ export default function LoginPage() {
             disabled={loading}
             className="w-full bg-white/10 hover:bg-white hover:text-black text-white font-bold py-3 px-4 border border-white/40 transition-all duration-200 tracking-wider text-sm uppercase text-center shadow-[0_0_10px_rgba(255,255,255,0.1)] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white/10 disabled:hover:text-white"
           >
-            {loading ? '[ VERIFICANDO... ]' : '[ Ingresar ]'}
+            {loading ? '[ Verificando credenciales... ]' : '[ Ingresar ]'}
           </button>
         </form>
 
